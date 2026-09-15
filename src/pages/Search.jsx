@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
+import BookCard from "../components/BookCard"
 
 const Search = () => {
     const navigate = useNavigate()
@@ -26,6 +27,7 @@ const Search = () => {
 
                 const data = await response.json()
 
+                setBooks(data.docs.slice(0, 20))
                 console.log(data)
             } catch (error) {
                 console.error(error)
@@ -35,7 +37,7 @@ const Search = () => {
         }
 
         loadBooks()
-    }, [])
+    }, [queryParam])
 
     return (
         <section className="content">
@@ -63,7 +65,9 @@ const Search = () => {
                     —
                 </span>
             </div>
-            <div className="book-grid" id="results" />
+            <div className="book-grid" id="results">
+                {books.map((book, i) => <BookCard {...book} key={i} />)}
+            </div>
         </section>
     )
 }
