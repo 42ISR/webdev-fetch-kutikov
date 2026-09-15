@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom"
 const Main = () => {
     const navigate = useNavigate()
     const [query, setQuery] = useState("")
+    
     const handleSubmit = (e) => {
         e.preventDefault()
         navigate('search' + '?q=' + encodeURIComponent(query))
     }
+
     return (
         <section className="hero">
             <div className="hero-content">
