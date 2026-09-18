@@ -1,5 +1,40 @@
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
+import Loader from "../components/Loader"
+
 const Book = () => {
-    return (
+    const { id } = useParams()
+    const [book, setBook] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState(false)
+
+
+    useEffect(() => {
+        const loadBook = async () => {
+            setError(null)
+            setIsLoading(true)
+            setBook(null)
+
+            try {
+                const response = await fetch(`https://openlibrary.org/works/${id}.json`)
+
+                const data = await response.json()
+
+                setBook(data)
+                console.log(data)
+            } catch (error) {
+                console.error(error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        loadBook()
+    }, [])
+
+    if (isLoading) return <Loader label="Загружаем книжку" />
+
+    if (!isLoading && book) return (
         <section className="book-page">
             <div className="book-page-cover">
                 <img
@@ -10,7 +45,7 @@ const Book = () => {
             </div>
             <div className="book-page-content">
                 <div className="section-label">КНИГА</div>
-                <h1 id="bookTitle">The Little Prince</h1>
+                <h1 id="bookTitle">{book.title}</h1>
                 <div className="book-page-author" id="bookAuthor">
                     Antoine de Saint-Exupéry
                 </div>
@@ -18,14 +53,12 @@ const Book = () => {
                     <span id="bookYear">1943</span>
                     <span>Fiction</span>
                 </div>
-                <div className="description">
+                {book.description.value && <div className="description">
                     <h3>Об этой книге</h3>
                     <p id="bookDescription">
-                        The Little Prince is a poetic tale about a young prince
-                        who travels from planet to planet and learns about
-                        friendship, love and the strange behavior of adults.
+                        {book.description.value}
                     </p>
-                </div>
+                </div>}
                 <div className="modal-actions">
                     <button className="primary-button">Читать</button>
                     <button className="secondary-button">♡ Сохранить</button>

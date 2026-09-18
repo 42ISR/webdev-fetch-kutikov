@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import BookCard from "../components/BookCard"
+import Loader from "../components/Loader"
 
 const Search = () => {
     const navigate = useNavigate()
@@ -8,7 +9,7 @@ const Search = () => {
     const queryParam = searchParams.get('q') || ""
     const [query, setQuery] = useState(queryParam)
 
-    const [books, setBooks] = useState([])
+    const [books, setBooks] = useState(null)
     const [error, setError] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -21,13 +22,14 @@ const Search = () => {
         const loadBooks = async () => {
             setError(null)
             setIsLoading(true)
+            setBooks(null)
 
             try {
                 const response = await fetch(`https://openlibrary.org/search.json?q=${query}`)
 
                 const data = await response.json()
 
-                setBooks(data.docs.slice(0, 20))
+                setBooks(data.docs.slice(0, 5))
                 console.log(data)
             } catch (error) {
                 console.error(error)
@@ -65,9 +67,12 @@ const Search = () => {
                     —
                 </span>
             </div>
-            <div className="book-grid" id="results">
-                {books.map((book, i) => <BookCard {...book} key={i} />)}
+            {isLoading && <Loader label={"Загружаем книжки..."} />}
+            {!isLoading && error && <h3>{error}</h3>}
+            {!isLoading && !error && books && <div className="book-grid" id="results">
+                {books.map((book, i) => <BookCard {...book} key={i} book_key={book.key} />)}
             </div>
+            }
         </section>
     )
 }
